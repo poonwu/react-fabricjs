@@ -45,6 +45,28 @@ export default class Canvas extends StaticCanvas {
 		this.drawControls = (ctx) => this.state.canvas &&
 			this.state.canvas.drawControls(ctx);
 	}
+
+	initEvent() {
+		super.initEvent();
+		const {canvas} = this.state;
+		if (!canvas) return;
+
+		if (this.props.onObjectRotating instanceof Function) {
+			canvas.on('object:rotating', this.props.onObjectRotating);
+		}		
+	}
+
+	eventChanged(nextProps) {
+		super.eventChanged(nextProps);
+		const {canvas} = this.state;
+		if (!canvas) return;
+
+		if (this.props.onObjectRotating && !nextProps.onObjectRotating) {
+			object.off('object:rotating');
+		} else if (nextProps.onObjectRotating instanceof Function) {
+			object.on('object:rotating', this.props.onObjectRotating);
+		}
+	}
 }
 
 Canvas.propTypes = Object.assign(StaticCanvas.propTypes, {
@@ -67,6 +89,7 @@ Canvas.propTypes = Object.assign(StaticCanvas.propTypes, {
 	targetFindTolerance: PropTypes.number,
 	skipTargetFind: PropTypes.bool,
 	isDrawingMode: PropTypes.bool,
+	onObjectRotating: PropTypes.func
 });
 
 Canvas.defaultProps = Object.assign(StaticCanvas.defaultProps, {
